@@ -687,52 +687,127 @@ body {
   color: var(--accent);
 }
 
-/* ===== Top bar (nav + data actions) ===== */
+/* ===== Top bar (nav + menu toggle) ===== */
 .top-bar {
   display: flex;
-  flex-direction: column;
   align-items: center;
   gap: 10px;
   margin-bottom: 1.5rem;
+  position: relative;
 }
 
-.data-actions {
-  display: flex;
-  gap: 8px;
-}
-
-.data-btn {
-  font-family: 'Noto Sans JP', sans-serif;
-  font-size: 12px;
-  font-weight: 500;
-  padding: 6px 14px;
-  border-radius: 99px;
+.menu-toggle {
+  font-size: 20px;
+  line-height: 1;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
   border: 1px solid var(--border);
   background: var(--surface);
   color: var(--text-secondary);
   cursor: pointer;
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 5px;
-  transition: all 0.15s;
+  justify-content: center;
   box-shadow: 0 1px 4px rgb(0 0 0 / 5%);
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.menu-toggle:hover {
+  background: var(--bg);
+  color: var(--text-primary);
+  border-color: rgb(0 0 0 / 20%);
+}
+
+.menu-toggle.active {
+  background: var(--accent-light);
+  color: var(--accent-dark);
+  border-color: var(--accent);
+}
+
+/* ===== Data drawer ===== */
+.data-drawer {
+  position: fixed;
+  top: 80px;
+  right: 1.5rem;
+  z-index: 50;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(-6px) scale(0.97);
+  transition: opacity 0.18s, transform 0.18s;
+  transform-origin: top right;
+}
+
+.data-drawer.open {
+  pointer-events: auto;
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.data-drawer-inner {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: 0 8px 32px rgb(0 0 0 / 12%);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 200px;
+}
+
+.data-drawer-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  padding: 2px 4px 6px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 2px;
+}
+
+.data-btn {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 9px 12px;
+  border-radius: 9px;
+  border: 1px solid transparent;
+  background: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.15s;
   white-space: nowrap;
+  width: 100%;
+  text-align: left;
 }
 
 .data-btn:hover {
   background: var(--bg);
-  border-color: rgb(0 0 0 / 20%);
   color: var(--text-primary);
 }
 
 .export-btn:hover {
   color: var(--accent-dark);
-  border-color: var(--accent);
+  background: var(--accent-light);
 }
 
 .import-btn:hover {
   color: var(--blue-text);
-  border-color: #6aaee8;
+  background: var(--blue-bg);
+}
+
+.data-btn-desc {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-tertiary);
+  margin-left: auto;
+  padding-left: 8px;
 }
 
 /* ===== Toast ===== */

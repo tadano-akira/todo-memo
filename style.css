@@ -725,8 +725,15 @@ body {
   color: var(--text-primary);
 }
 
-.export-btn:hover { color: var(--accent-dark); border-color: var(--accent); }
-.import-btn:hover { color: var(--blue-text); border-color: #6aaee8; }
+.export-btn:hover {
+  color: var(--accent-dark);
+  border-color: var(--accent);
+}
+
+.import-btn:hover {
+  color: var(--blue-text);
+  border-color: #6aaee8;
+}
 
 /* ===== Toast ===== */
 .import-toast {

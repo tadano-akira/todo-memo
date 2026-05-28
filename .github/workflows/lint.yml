@@ -18,7 +18,7 @@ jobs:
           node-version: 22
 
       - name: Install packages
-        run: npm install
+        run: npm ci
 
       - name: HTML check
         run: npm run lint:html

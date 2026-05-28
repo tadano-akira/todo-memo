@@ -18,10 +18,15 @@
       <button class="nav-btn" onclick="showPage('memo', this)">メモ</button>
       <button class="nav-btn" onclick="showPage('notepad', this)">テキスト</button>
     </nav>
-    <div class="data-actions">
-      <button class="data-btn export-btn" onclick="exportData()" title="全データをJSONファイルとして保存">📤 エクスポート</button>
-      <label class="data-btn import-btn" title="JSONファイルからデータを読み込む">
-        📥 インポート
+    <button class="menu-toggle" id="menu-toggle" onclick="toggleDataMenu()" title="データ管理">≡</button>
+  </div>
+
+  <div class="data-drawer" id="data-drawer">
+    <div class="data-drawer-inner">
+      <div class="data-drawer-title">データ管理</div>
+      <button class="data-btn export-btn" onclick="exportData()">📤 エクスポート<span class="data-btn-desc">全データをJSONで保存</span></button>
+      <label class="data-btn import-btn">
+        📥 インポート<span class="data-btn-desc">JSONからデータを読み込む</span>
         <input type="file" accept=".json" onchange="importData(event)" style="display:none">
       </label>
     </div>
@@ -413,6 +418,23 @@ editor.addEventListener('keydown', e => {
 function esc(s) {
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
+
+function toggleDataMenu() {
+  const drawer = document.getElementById('data-drawer');
+  const toggle = document.getElementById('menu-toggle');
+  const isOpen = drawer.classList.toggle('open');
+  toggle.classList.toggle('active', isOpen);
+}
+
+// ドロワー外クリックで閉じる
+document.addEventListener('click', (e) => {
+  const drawer = document.getElementById('data-drawer');
+  const toggle = document.getElementById('menu-toggle');
+  if (drawer.classList.contains('open') && !drawer.contains(e.target) && e.target !== toggle) {
+    drawer.classList.remove('open');
+    toggle.classList.remove('active');
+  }
+});
 
 /* ===========================
    EXPORT / IMPORT

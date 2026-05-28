@@ -47,7 +47,6 @@ body {
 .site-nav {
   display: flex;
   gap: 6px;
-  margin-bottom: 1.5rem;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 99px;
@@ -686,4 +685,76 @@ body {
 
 .save-indicator.saved {
   color: var(--accent);
+}
+
+/* ===== Top bar (nav + data actions) ===== */
+.top-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 1.5rem;
+}
+
+.data-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.data-btn {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 6px 14px;
+  border-radius: 99px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.15s;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 5%);
+  white-space: nowrap;
+}
+
+.data-btn:hover {
+  background: var(--bg);
+  border-color: rgb(0 0 0 / 20%);
+  color: var(--text-primary);
+}
+
+.export-btn:hover {
+  color: var(--accent-dark);
+  border-color: var(--accent);
+}
+
+.import-btn:hover {
+  color: var(--blue-text);
+  border-color: #6aaee8;
+}
+
+/* ===== Toast ===== */
+.import-toast {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--text-primary);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 10px 22px;
+  border-radius: 99px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s, transform 0.25s;
+  z-index: 200;
+  white-space: nowrap;
+}
+
+.import-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
 }

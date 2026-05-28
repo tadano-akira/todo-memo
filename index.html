@@ -12,11 +12,20 @@
 <body>
 <div class="shell">
 
-  <nav class="site-nav">
-    <button class="nav-btn active" onclick="showPage('todo', this)">ToDo</button>
-    <button class="nav-btn" onclick="showPage('memo', this)">メモ</button>
-    <button class="nav-btn" onclick="showPage('notepad', this)">テキスト</button>
-  </nav>
+  <div class="top-bar">
+    <nav class="site-nav">
+      <button class="nav-btn active" onclick="showPage('todo', this)">ToDo</button>
+      <button class="nav-btn" onclick="showPage('memo', this)">メモ</button>
+      <button class="nav-btn" onclick="showPage('notepad', this)">テキスト</button>
+    </nav>
+    <div class="data-actions">
+      <button class="data-btn export-btn" onclick="exportData()" title="全データをJSONファイルとして保存">📤 エクスポート</button>
+      <label class="data-btn import-btn" title="JSONファイルからデータを読み込む">
+        📥 インポート
+        <input type="file" accept=".json" onchange="importData(event)" style="display:none">
+      </label>
+    </div>
+  </div>
 
   <div class="card">
 
@@ -405,9 +414,81 @@ function esc(s) {
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
+/* ===========================
+   EXPORT / IMPORT
+=========================== */
+function exportData() {
+  const data = {
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    todos: todos,
+    memos: memos,
+    notepad: localStorage.getItem(NOTEPAD_KEY) || ''
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  const now = new Date();
+  const ts = now.getFullYear()
+    + ('0'+(now.getMonth()+1)).slice(-2)
+    + ('0'+now.getDate()).slice(-2)
+    + '_' + ('0'+now.getHours()).slice(-2)
+    + ('0'+now.getMinutes()).slice(-2);
+  a.href = URL.createObjectURL(blob);
+  a.download = 'mytools_backup_' + ts + '.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!data.version || !Array.isArray(data.todos) || !Array.isArray(data.memos)) {
+        alert('ファイルの形式が正しくありません。\nこのアプリでエクスポートしたJSONファイルを選択してください。');
+        return;
+      }
+      if (!confirm('現在のデータをインポートしたデータで上書きしますか？\n（この操作は元に戻せません）')) return;
+
+      todos = data.todos;
+      todoNextId = todos.reduce((max, t) => Math.max(max, t.id), 0) + 1;
+      saveTodos();
+      renderTodo();
+
+      memos = data.memos;
+      memoNextId = memos.reduce((max, m) => Math.max(max, m.id), 0) + 1;
+      saveMemos();
+      renderMemo();
+
+      if (data.notepad !== undefined) {
+        localStorage.setItem(NOTEPAD_KEY, data.notepad);
+        editor.value = data.notepad;
+        charCount.textContent = data.notepad.length.toLocaleString() + ' 文字';
+        saveIndicator.textContent = '保存済み';
+        saveIndicator.classList.add('saved');
+      }
+
+      showImportSuccess();
+    } catch {
+      alert('ファイルの読み込みに失敗しました。\nJSONファイルが壊れている可能性があります。');
+    }
+    event.target.value = '';
+  };
+  reader.readAsText(file);
+}
+
+function showImportSuccess() {
+  const toast = document.getElementById('import-toast');
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2500);
+}
+
 /* Init */
 renderTodo();
 renderMemo();
 </script>
+<div id="import-toast" class="import-toast">✅ インポート完了！データを読み込みました</div>
 </body>
 </html>

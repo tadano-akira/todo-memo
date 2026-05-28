@@ -1,3 +1,279 @@
-body {
-  margin: 0;
-}
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #F7F5F0;
+    --surface: #FFFFFF;
+    --text-primary: #1A1916;
+    --text-secondary: #5C5A55;
+    --text-tertiary: #9E9C97;
+    --border: rgba(0,0,0,0.1);
+    --accent: #1D9E75;
+    --accent-light: #E1F5EE;
+    --accent-dark: #0F6E56;
+    --blue-bg: #E6F1FB;
+    --blue-text: #0C447C;
+    --purple-bg: #EEEDFE;
+    --purple-text: #3C3489;
+    --amber-bg: #FAEEDA;
+    --amber-text: #633806;
+    --red-bg: #FCEBEB;
+    --red-text: #A32D2D;
+  }
+  html, body {
+    min-height: 100%;
+    background: var(--bg);
+    font-family: 'Noto Sans JP', sans-serif;
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+  }
+  .shell {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2.5rem 1rem 3rem;
+  }
+
+  /* ===== Nav ===== */
+  .site-nav {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 1.5rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    padding: 5px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+  }
+  .nav-btn {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 13px; font-weight: 500;
+    padding: 7px 24px;
+    border-radius: 99px;
+    border: none; background: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.18s;
+    white-space: nowrap;
+  }
+  .nav-btn:hover { color: var(--text-primary); background: var(--bg); }
+  .nav-btn.active { background: var(--accent); color: #fff; }
+
+  /* ===== Card ===== */
+  .card {
+    background: var(--surface);
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    width: 100%;
+    max-width: 720px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.07);
+    overflow: hidden;
+  }
+
+  /* ===== Pages ===== */
+  .page { display: none; }
+  .page.active { display: block; animation: fadeUp 0.3s ease; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ===== Shared ===== */
+  .page-header {
+    padding: 2.5rem 3.5rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .page-header.with-action {
+    display: flex; align-items: flex-end;
+    justify-content: space-between; gap: 1rem;
+  }
+  .page-label {
+    font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--accent); font-weight: 700; margin-bottom: 0.4rem;
+  }
+  .page-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px; font-weight: 400; color: var(--text-primary); line-height: 1.2;
+  }
+  .btn {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 13px; font-weight: 500;
+    padding: 8px 18px; border-radius: 9px;
+    border: 1px solid var(--border); background: none;
+    color: var(--text-secondary); cursor: pointer;
+    display: inline-flex; align-items: center; gap: 6px;
+    transition: all 0.15s; white-space: nowrap;
+  }
+  .btn:hover { background: var(--bg); border-color: rgba(0,0,0,0.2); }
+  .btn-accent { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 700; }
+  .btn-accent:hover { opacity: 0.85; background: var(--accent); }
+  .filter-bar {
+    padding: 0.7rem 3.5rem; border-bottom: 1px solid var(--border);
+    display: flex; gap: 6px; flex-wrap: wrap;
+  }
+  .filter-btn {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 12px; font-weight: 500;
+    padding: 5px 13px; border-radius: 99px;
+    border: 1px solid var(--border); background: none;
+    color: var(--text-secondary); cursor: pointer; transition: all 0.15s;
+  }
+  .filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .filter-btn:hover:not(.active) { background: var(--bg); }
+  .empty-msg { text-align: center; color: var(--text-tertiary); font-size: 14px; padding: 3rem 0; }
+
+  /* ===========================
+     TODO
+  =========================== */
+  .todo-stats { text-align: right; font-size: 12px; color: var(--text-tertiary); line-height: 1.8; white-space: nowrap; }
+  .todo-stats span { color: var(--accent); font-weight: 700; }
+  .add-area {
+    padding: 1.25rem 3.5rem; border-bottom: 1px solid var(--border);
+    display: flex; gap: 10px;
+  }
+  .add-input {
+    flex: 1; font-family: 'Noto Sans JP', sans-serif; font-size: 14px;
+    padding: 9px 14px; border: 1px solid var(--border); border-radius: 10px;
+    background: var(--bg); color: var(--text-primary); outline: none;
+    transition: border-color 0.15s;
+  }
+  .add-input:focus { border-color: var(--accent); }
+  .add-input::placeholder { color: var(--text-tertiary); }
+  .priority-select {
+    font-family: 'Noto Sans JP', sans-serif; font-size: 13px;
+    padding: 9px 10px; border: 1px solid var(--border); border-radius: 10px;
+    background: var(--bg); color: var(--text-primary); outline: none; cursor: pointer;
+  }
+  .todo-list { padding: 1rem 3.5rem 2rem; min-height: 180px; }
+  .todo-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 0; border-bottom: 1px solid var(--border);
+    animation: fadeUp 0.25s ease;
+  }
+  .todo-item:last-child { border-bottom: none; }
+  .todo-check {
+    width: 20px; height: 20px; border: 2px solid var(--border); border-radius: 6px;
+    cursor: pointer; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+  .todo-check:hover { border-color: var(--accent); }
+  .todo-check.checked { background: var(--accent); border-color: var(--accent); }
+  .todo-check.checked::after {
+    content: ''; width: 5px; height: 9px;
+    border-right: 2px solid #fff; border-bottom: 2px solid #fff;
+    transform: rotate(45deg) translate(-1px, -1px); display: block;
+  }
+  .todo-text { flex: 1; font-size: 14px; color: var(--text-primary); line-height: 1.5; transition: color 0.15s; }
+  .todo-text.done { color: var(--text-tertiary); text-decoration: line-through; }
+  .priority-badge { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 99px; flex-shrink: 0; }
+  .p-high   { background: var(--red-bg);      color: var(--red-text); }
+  .p-medium { background: var(--amber-bg);    color: var(--amber-text); }
+  .p-low    { background: var(--accent-light); color: var(--accent-dark); }
+  .delete-btn {
+    background: none; border: none; cursor: pointer;
+    color: var(--text-tertiary); font-size: 18px; line-height: 1;
+    padding: 2px 4px; border-radius: 4px; transition: color 0.15s; flex-shrink: 0;
+  }
+  .delete-btn:hover { color: var(--red-text); }
+  .edit-btn {
+    background: none; border: none; cursor: pointer;
+    color: var(--text-tertiary); font-size: 14px; line-height: 1;
+    padding: 2px 4px; border-radius: 4px; transition: color 0.15s; flex-shrink: 0;
+  }
+  .edit-btn:hover { color: var(--accent); }
+  .todo-edit-input {
+    flex: 1; font-family: 'Noto Sans JP', sans-serif; font-size: 14px;
+    padding: 4px 8px; border: 1px solid var(--accent); border-radius: 6px;
+    background: var(--bg); color: var(--text-primary); outline: none;
+  }
+
+  /* ===========================
+     MEMO
+  =========================== */
+  .add-row { padding: 1.25rem 3.5rem 0; display: flex; justify-content: flex-end; }
+  .memo-grid {
+    padding: 1rem 3.5rem 2rem;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  }
+  .memo-grid .empty-msg { grid-column: 1 / -1; }
+  .memo-card { border: 1px solid var(--border); border-radius: 14px; overflow: hidden; transition: box-shadow 0.15s; }
+  .memo-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.07); }
+  .memo-card-header {
+    padding: 10px 14px 8px; display: flex; align-items: center;
+    justify-content: space-between; gap: 8px; border-bottom: 1px solid var(--border);
+  }
+  .memo-card-title { font-size: 13px; font-weight: 700; color: var(--text-primary); flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cat-badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 99px; flex-shrink: 0; }
+  .cat-command { background: var(--blue-bg);    color: var(--blue-text); }
+  .cat-script  { background: var(--purple-bg);  color: var(--purple-text); }
+  .cat-prompt  { background: var(--amber-bg);   color: var(--amber-text); }
+  .cat-other   { background: var(--accent-light); color: var(--accent-dark); }
+  .memo-card-body {
+    padding: 10px 14px 12px;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    color: var(--text-secondary); line-height: 1.7;
+    white-space: pre-wrap; word-break: break-all;
+    max-height: 140px; overflow-y: auto; background: var(--bg);
+  }
+  .memo-card-footer { padding: 6px 14px; display: flex; justify-content: flex-end; gap: 6px; }
+  .icon-btn {
+    background: none; border: none; cursor: pointer; font-size: 13px;
+    color: var(--text-tertiary); padding: 3px 6px; border-radius: 5px;
+    transition: all 0.15s; font-family: 'Noto Sans JP', sans-serif;
+  }
+  .icon-btn:hover { background: var(--bg); color: var(--text-primary); }
+  .copy-ok { color: var(--accent) !important; }
+
+  /* Modal */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.35); z-index: 100;
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface); border-radius: 16px; padding: 2rem;
+    width: 480px; max-width: 90vw;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.15);
+    animation: fadeUp 0.2s ease;
+  }
+  .modal-title { font-size: 16px; font-weight: 700; margin-bottom: 1rem; }
+  .modal label { font-size: 12px; font-weight: 700; color: var(--text-tertiary); letter-spacing: 0.06em; display: block; margin-bottom: 5px; margin-top: 14px; }
+  .modal input, .modal select, .modal textarea {
+    width: 100%; font-family: 'Noto Sans JP', sans-serif; font-size: 13px;
+    padding: 9px 12px; border: 1px solid var(--border); border-radius: 9px;
+    background: var(--bg); color: var(--text-primary); outline: none; transition: border-color 0.15s;
+  }
+  .modal textarea { font-family: 'JetBrains Mono', monospace; font-size: 12px; min-height: 110px; resize: vertical; }
+  .modal input:focus, .modal select:focus, .modal textarea:focus { border-color: var(--accent); }
+  .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 1.25rem; }
+
+  /* ===========================
+     NOTEPAD
+  =========================== */
+  .notepad-actions { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+  .toolbar {
+    padding: 0.6rem 3.5rem; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  }
+  .font-toggle {
+    font-family: 'Noto Sans JP', sans-serif; font-size: 12px; font-weight: 500;
+    padding: 4px 12px; border-radius: 99px; border: 1px solid var(--border);
+    background: none; color: var(--text-secondary); cursor: pointer; transition: all 0.15s;
+  }
+  .font-toggle.active { background: var(--accent-light); color: var(--accent-dark); border-color: var(--accent); }
+  .toolbar-sep { width: 1px; height: 20px; background: var(--border); margin: 0 4px; }
+  .char-count { font-size: 12px; color: var(--text-tertiary); margin-left: auto; }
+  .editor-wrap { padding: 2rem 3.5rem 1rem; }
+  .editor {
+    width: 100%; min-height: 360px;
+    font-family: 'Noto Sans JP', sans-serif; font-size: 15px;
+    color: var(--text-primary); line-height: 1.9;
+    border: none; outline: none; resize: none; background: transparent;
+    caret-color: var(--accent);
+  }
+  .editor.mono { font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.8; }
+  .editor::placeholder { color: var(--text-tertiary); }
+  .save-indicator { font-size: 11px; color: var(--text-tertiary); padding: 0 3.5rem 1.25rem; text-align: right; }
+  .save-indicator.saved { color: var(--accent); }

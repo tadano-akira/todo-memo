@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>マイツール</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=DM+Serif+Display&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #F7F5F0;
+    --surface: #FFFFFF;
+    --text-primary: #1A1916;
+    --text-secondary: #5C5A55;
+    --text-tertiary: #9E9C97;
+    --border: rgba(0,0,0,0.1);
+    --accent: #1D9E75;
+    --accent-light: #E1F5EE;
+    --accent-dark: #0F6E56;
+    --blue-bg: #E6F1FB;
+    --blue-text: #0C447C;
+    --purple-bg: #EEEDFE;
+    --purple-text: #3C3489;
+    --amber-bg: #FAEEDA;
+    --amber-text: #633806;
+    --red-bg: #FCEBEB;
+    --red-text: #A32D2D;
+  }
+  html, body {
+    min-height: 100%;
+    background: var(--bg);
+    font-family: 'Noto Sans JP', sans-serif;
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+  }
+  .shell {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2.5rem 1rem 3rem;
+  }
+
+  /* ===== Nav ===== */
+  .site-nav {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 1.5rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    padding: 5px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+  }
+  .nav-btn {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 13px; font-weight: 500;
+    padding: 7px 24px;
+    border-radius: 99px;
+    border: none; background: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.18s;
+    white-space: nowrap;
+  }
+  .nav-btn:hover { color: var(--text-primary); background: var(--bg); }
+  .nav-btn.active { background: var(--accent); color: #fff; }
+
+  /* ===== Card ===== */
+  .card {
+    background: var(--surface);
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    width: 100%;
+    max-width: 720px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.07);
+    overflow: hidden;
+  }
+
+  /* ===== Pages ===== */
+  .page { display: none; }
+  .page.active { display: block; animation: fadeUp 0.3s ease; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ===== Shared ===== */
+  .page-header {
+    padding: 2.5rem 3.5rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .page-header.with-action {
+    display: flex; align-items: flex-end;
+    justify-content: space-between; gap: 1rem;
+  }
+  .page-label {
+    font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--accent); font-weight: 700; margin-bottom: 0.4rem;
+  }
+  .page-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px; font-weight: 400; color: var(--text-primary); line-height: 1.2;
+  }
+  .btn {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 13px; font-weight: 500;
+    padding: 8px 18px; border-radius: 9px;
+    border: 1px solid var(--border); background: none;
+    color: var(--text-secondary); cursor: pointer;
+    display: inline-flex; align-items: center; gap: 6px;
+    transition: all 0.15s; white-space: nowrap;
+  }
+  .btn:hover { background: var(--bg); border-color: rgba(0,0,0,0.2); }
+  .btn-accent { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 700; }
+  .btn-accent:hover { opacity: 0.85; background: var(--accent); }
+  .filter-bar {
+    padding: 0.7rem 3.5rem; border-bottom: 1px solid var(--border);
+    display: flex; gap: 6px; flex-wrap: wrap;
+  }
+  .filter-btn {
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 12px; font-weight: 500;
+    padding: 5px 13px; border-radius: 99px;
+    border: 1px solid var(--border); background: none;
+    color: var(--text-secondary); cursor: pointer; transition: all 0.15s;
+  }
+  .filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .filter-btn:hover:not(.active) { background: var(--bg); }
+  .empty-msg { text-align: center; color: var(--text-tertiary); font-size: 14px; padding: 3rem 0; }
+
+  /* ===========================
+     TODO
+  =========================== */
+  .todo-stats { text-align: right; font-size: 12px; color: var(--text-tertiary); line-height: 1.8; white-space: nowrap; }
+  .todo-stats span { color: var(--accent); font-weight: 700; }
+  .add-area {
+    padding: 1.25rem 3.5rem; border-bottom: 1px solid var(--border);
+    display: flex; gap: 10px;
+  }
+  .add-input {
+    flex: 1; font-family: 'Noto Sans JP', sans-serif; font-size: 14px;
+    padding: 9px 14px; border: 1px solid var(--border); border-radius: 10px;
+    background: var(--bg); color: var(--text-primary); outline: none;
+    transition: border-color 0.15s;
+  }
+  .add-input:focus { border-color: var(--accent); }
+  .add-input::placeholder { color: var(--text-tertiary); }
+  .priority-select {
+    font-family: 'Noto Sans JP', sans-serif; font-size: 13px;
+    padding: 9px 10px; border: 1px solid var(--border); border-radius: 10px;
+    background: var(--bg); color: var(--text-primary); outline: none; cursor: pointer;
+  }
+  .todo-list { padding: 1rem 3.5rem 2rem; min-height: 180px; }
+  .todo-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 0; border-bottom: 1px solid var(--border);
+    animation: fadeUp 0.25s ease;
+  }
+  .todo-item:last-child { border-bottom: none; }
+  .todo-check {
+    width: 20px; height: 20px; border: 2px solid var(--border); border-radius: 6px;
+    cursor: pointer; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+  .todo-check:hover { border-color: var(--accent); }
+  .todo-check.checked { background: var(--accent); border-color: var(--accent); }
+  .todo-check.checked::after {
+    content: ''; width: 5px; height: 9px;
+    border-right: 2px solid #fff; border-bottom: 2px solid #fff;
+    transform: rotate(45deg) translate(-1px, -1px); display: block;
+  }
+  .todo-text { flex: 1; font-size: 14px; color: var(--text-primary); line-height: 1.5; transition: color 0.15s; }
+  .todo-text.done { color: var(--text-tertiary); text-decoration: line-through; }
+  .priority-badge { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 99px; flex-shrink: 0; }
+  .p-high   { background: var(--red-bg);      color: var(--red-text); }
+  .p-medium { background: var(--amber-bg);    color: var(--amber-text); }
+  .p-low    { background: var(--accent-light); color: var(--accent-dark); }
+  .delete-btn {
+    background: none; border: none; cursor: pointer;
+    color: var(--text-tertiary); font-size: 18px; line-height: 1;
+    padding: 2px 4px; border-radius: 4px; transition: color 0.15s; flex-shrink: 0;
+  }
+  .delete-btn:hover { color: var(--red-text); }
+  .edit-btn {
+    background: none; border: none; cursor: pointer;
+    color: var(--text-tertiary); font-size: 14px; line-height: 1;
+    padding: 2px 4px; border-radius: 4px; transition: color 0.15s; flex-shrink: 0;
+  }
+  .edit-btn:hover { color: var(--accent); }
+  .todo-edit-input {
+    flex: 1; font-family: 'Noto Sans JP', sans-serif; font-size: 14px;
+    padding: 4px 8px; border: 1px solid var(--accent); border-radius: 6px;
+    background: var(--bg); color: var(--text-primary); outline: none;
+  }
+
+  /* ===========================
+     MEMO
+  =========================== */
+  .add-row { padding: 1.25rem 3.5rem 0; display: flex; justify-content: flex-end; }
+  .memo-grid {
+    padding: 1rem 3.5rem 2rem;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  }
+  .memo-grid .empty-msg { grid-column: 1 / -1; }
+  .memo-card { border: 1px solid var(--border); border-radius: 14px; overflow: hidden; transition: box-shadow 0.15s; }
+  .memo-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.07); }
+  .memo-card-header {
+    padding: 10px 14px 8px; display: flex; align-items: center;
+    justify-content: space-between; gap: 8px; border-bottom: 1px solid var(--border);
+  }
+  .memo-card-title { font-size: 13px; font-weight: 700; color: var(--text-primary); flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cat-badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 99px; flex-shrink: 0; }
+  .cat-command { background: var(--blue-bg);    color: var(--blue-text); }
+  .cat-script  { background: var(--purple-bg);  color: var(--purple-text); }
+  .cat-prompt  { background: var(--amber-bg);   color: var(--amber-text); }
+  .cat-other   { background: var(--accent-light); color: var(--accent-dark); }
+  .memo-card-body {
+    padding: 10px 14px 12px;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    color: var(--text-secondary); line-height: 1.7;
+    white-space: pre-wrap; word-break: break-all;
+    max-height: 140px; overflow-y: auto; background: var(--bg);
+  }
+  .memo-card-footer { padding: 6px 14px; display: flex; justify-content: flex-end; gap: 6px; }
+  .icon-btn {
+    background: none; border: none; cursor: pointer; font-size: 13px;
+    color: var(--text-tertiary); padding: 3px 6px; border-radius: 5px;
+    transition: all 0.15s; font-family: 'Noto Sans JP', sans-serif;
+  }
+  .icon-btn:hover { background: var(--bg); color: var(--text-primary); }
+  .copy-ok { color: var(--accent) !important; }
+
+  /* Modal */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.35); z-index: 100;
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface); border-radius: 16px; padding: 2rem;
+    width: 480px; max-width: 90vw;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.15);
+    animation: fadeUp 0.2s ease;
+  }
+  .modal-title { font-size: 16px; font-weight: 700; margin-bottom: 1rem; }
+  .modal label { font-size: 12px; font-weight: 700; color: var(--text-tertiary); letter-spacing: 0.06em; display: block; margin-bottom: 5px; margin-top: 14px; }
+  .modal input, .modal select, .modal textarea {
+    width: 100%; font-family: 'Noto Sans JP', sans-serif; font-size: 13px;
+    padding: 9px 12px; border: 1px solid var(--border); border-radius: 9px;
+    background: var(--bg); color: var(--text-primary); outline: none; transition: border-color 0.15s;
+  }
+  .modal textarea { font-family: 'JetBrains Mono', monospace; font-size: 12px; min-height: 110px; resize: vertical; }
+  .modal input:focus, .modal select:focus, .modal textarea:focus { border-color: var(--accent); }
+  .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 1.25rem; }
+
+  /* ===========================
+     NOTEPAD
+  =========================== */
+  .notepad-actions { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+  .toolbar {
+    padding: 0.6rem 3.5rem; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  }
+  .font-toggle {
+    font-family: 'Noto Sans JP', sans-serif; font-size: 12px; font-weight: 500;
+    padding: 4px 12px; border-radius: 99px; border: 1px solid var(--border);
+    background: none; color: var(--text-secondary); cursor: pointer; transition: all 0.15s;
+  }
+  .font-toggle.active { background: var(--accent-light); color: var(--accent-dark); border-color: var(--accent); }
+  .toolbar-sep { width: 1px; height: 20px; background: var(--border); margin: 0 4px; }
+  .char-count { font-size: 12px; color: var(--text-tertiary); margin-left: auto; }
+  .editor-wrap { padding: 2rem 3.5rem 1rem; }
+  .editor {
+    width: 100%; min-height: 360px;
+    font-family: 'Noto Sans JP', sans-serif; font-size: 15px;
+    color: var(--text-primary); line-height: 1.9;
+    border: none; outline: none; resize: none; background: transparent;
+    caret-color: var(--accent);
+  }
+  .editor.mono { font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.8; }
+  .editor::placeholder { color: var(--text-tertiary); }
+  .save-indicator { font-size: 11px; color: var(--text-tertiary); padding: 0 3.5rem 1.25rem; text-align: right; }
+  .save-indicator.saved { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <nav class="site-nav">
+    <button class="nav-btn active" onclick="showPage('todo', this)">ToDo</button>
+    <button class="nav-btn" onclick="showPage('memo', this)">メモ</button>
+    <button class="nav-btn" onclick="showPage('notepad', this)">テキスト</button>
+  </nav>
+
+  <div class="card">
+
+    <!-- ======================== TODO ======================== -->
+    <div class="page active" id="page-todo">
+      <div class="page-header with-action">
+        <div>
+          <div class="page-label">Tasks</div>
+          <div class="page-title">ToDoリスト</div>
+        </div>
+        <div class="todo-stats">
+          残り <span id="remaining">0</span> 件 / 合計 <span id="total-count">0</span> 件<br>
+          完了 <span id="done-count">0</span> 件
+        </div>
+      </div>
+      <div class="add-area">
+        <input class="add-input" id="new-todo" type="text" placeholder="新しいタスクを入力..." />
+        <select class="priority-select" id="new-priority">
+          <option value="high">高</option>
+          <option value="medium" selected>中</option>
+          <option value="low">低</option>
+        </select>
+        <button class="btn btn-accent" onclick="addTodo()">追加</button>
+      </div>
+      <div class="filter-bar">
+        <button class="filter-btn active" onclick="setTodoFilter('all', this)">すべて</button>
+        <button class="filter-btn" onclick="setTodoFilter('active', this)">未完了</button>
+        <button class="filter-btn" onclick="setTodoFilter('done', this)">完了済み</button>
+        <button class="filter-btn" onclick="setTodoFilter('high', this)">優先度：高</button>
+      </div>
+      <div class="todo-list" id="todo-list"></div>
+    </div>
+
+    <!-- ======================== MEMO ======================== -->
+    <div class="page" id="page-memo">
+      <div class="page-header">
+        <div class="page-label">Notes</div>
+        <div class="page-title">簡易メモ</div>
+      </div>
+      <div class="filter-bar">
+        <button class="filter-btn active" onclick="setMemoFilter('all', this)">すべて</button>
+        <button class="filter-btn" onclick="setMemoFilter('command', this)">コマンド</button>
+        <button class="filter-btn" onclick="setMemoFilter('script', this)">スクリプト</button>
+        <button class="filter-btn" onclick="setMemoFilter('prompt', this)">プロンプト</button>
+        <button class="filter-btn" onclick="setMemoFilter('other', this)">その他</button>
+      </div>
+      <div class="add-row">
+        <button class="btn btn-accent" onclick="openMemoModal()">＋ メモを追加</button>
+      </div>
+      <div class="memo-grid" id="memo-grid"></div>
+    </div>
+
+    <!-- ======================== NOTEPAD ======================== -->
+    <div class="page" id="page-notepad">
+      <div class="page-header with-action">
+        <div>
+          <div class="page-label">Notepad</div>
+          <div class="page-title">テキスト入力</div>
+        </div>
+        <div class="notepad-actions">
+          <button class="btn" id="copy-btn" onclick="copyAll()">コピー</button>
+          <button class="btn" onclick="downloadTxt()">保存 (.txt)</button>
+          <button class="btn" onclick="clearAll()">クリア</button>
+        </div>
+      </div>
+      <div class="toolbar">
+        <button class="font-toggle active" id="font-sans" onclick="setEditorFont('sans')">読みやすいフォント</button>
+        <button class="font-toggle" id="font-mono" onclick="setEditorFont('mono')">等幅フォント</button>
+        <div class="toolbar-sep"></div>
+        <span class="char-count" id="char-count">0 文字</span>
+      </div>
+      <div class="editor-wrap">
+        <textarea class="editor" id="editor" placeholder="ここにテキストを入力してください。「保存 (.txt)」でファイルとしてダウンロードできます。"></textarea>
+      </div>
+      <div class="save-indicator" id="save-indicator">未入力</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Memo Modal -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <div class="modal-title">メモを追加</div>
+    <label>タイトル</label>
+    <input type="text" id="m-title" placeholder="例: Dockerコンテナ起動コマンド" />
+    <label>カテゴリ</label>
+    <select id="m-cat">
+      <option value="command">コマンド</option>
+      <option value="script">スクリプト</option>
+      <option value="prompt">プロンプト</option>
+      <option value="other">その他</option>
+    </select>
+    <label>内容</label>
+    <textarea id="m-body" placeholder="コマンド、スクリプト、プロンプトなどを貼り付け..."></textarea>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeMemoModal()">キャンセル</button>
+      <button class="btn btn-accent" onclick="saveMemo()">保存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===== Page switcher ===== */
+function showPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+/* ===========================
+   STORAGE HELPERS
+=========================== */
+const TODO_KEY = 'mytools_todos';
+const MEMO_KEY = 'mytools_memos';
+
+function loadTodos() {
+  try { return JSON.parse(localStorage.getItem(TODO_KEY)) || null; } catch { return null; }
+}
+function saveTodos() {
+  localStorage.setItem(TODO_KEY, JSON.stringify(todos));
+}
+function loadMemos() {
+  try { return JSON.parse(localStorage.getItem(MEMO_KEY)) || null; } catch { return null; }
+}
+function saveMemos() {
+  localStorage.setItem(MEMO_KEY, JSON.stringify(memos));
+}
+
+/* ===========================
+   TODO
+=========================== */
+const TODO_DEFAULTS = [
+  { id: 1, text: 'ポートフォリオサイトを更新する', priority: 'high', done: false },
+  { id: 2, text: '面接準備資料をまとめる', priority: 'high', done: false },
+  { id: 3, text: 'GitHubのREADMEを整備する', priority: 'medium', done: false },
+  { id: 4, text: 'Dockerの復習をする', priority: 'medium', done: true },
+];
+let todos = loadTodos() || TODO_DEFAULTS;
+let todoNextId = todos.reduce((max, t) => Math.max(max, t.id), 0) + 1;
+let todoFilter = 'all';
+
+function addTodo() {
+  const input = document.getElementById('new-todo');
+  const text = input.value.trim();
+  if (!text) return;
+  todos.unshift({ id: todoNextId++, text, priority: document.getElementById('new-priority').value, done: false });
+  input.value = '';
+  saveTodos();
+  renderTodo();
+}
+document.getElementById('new-todo').addEventListener('keydown', e => { if (e.key === 'Enter') addTodo(); });
+
+function toggleTodo(id) {
+  const t = todos.find(t => t.id === id);
+  if (t) t.done = !t.done;
+  saveTodos();
+  renderTodo();
+}
+function deleteTodo(id) {
+  todos = todos.filter(t => t.id !== id);
+  saveTodos();
+  renderTodo();
+}
+
+function editTodo(id) {
+  const item = document.querySelector(`.todo-item[data-id="${id}"]`);
+  if (!item) return;
+  const t = todos.find(t => t.id === id);
+  if (!t) return;
+  const textEl = item.querySelector('.todo-text');
+  const editBtn = item.querySelector('.edit-btn');
+
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.className = 'todo-edit-input';
+  input.value = t.text;
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') saveEditTodo(id, input);
+    if (e.key === 'Escape') renderTodo();
+  });
+  textEl.replaceWith(input);
+  input.focus();
+  input.select();
+
+  editBtn.textContent = '✓';
+  editBtn.title = '保存';
+  editBtn.onclick = () => saveEditTodo(id, input);
+}
+
+function saveEditTodo(id, input) {
+  const newText = input.value.trim();
+  if (!newText) return;
+  const t = todos.find(t => t.id === id);
+  if (t) { t.text = newText; saveTodos(); }
+  renderTodo();
+}
+
+function setTodoFilter(f, btn) {
+  todoFilter = f;
+  document.querySelectorAll('#page-todo .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderTodo();
+}
+
+function renderTodo() {
+  const list = document.getElementById('todo-list');
+  let filtered = todos;
+  if (todoFilter === 'active') filtered = todos.filter(t => !t.done);
+  else if (todoFilter === 'done') filtered = todos.filter(t => t.done);
+  else if (todoFilter === 'high') filtered = todos.filter(t => t.priority === 'high');
+  document.getElementById('total-count').textContent = todos.length;
+  document.getElementById('done-count').textContent  = todos.filter(t => t.done).length;
+  document.getElementById('remaining').textContent   = todos.filter(t => !t.done).length;
+  if (!filtered.length) { list.innerHTML = '<div class="empty-msg">タスクがありません</div>'; return; }
+  const labels = { high: '高', medium: '中', low: '低' };
+  list.innerHTML = filtered.map(t => `
+    <div class="todo-item" data-id="${t.id}">
+      <div class="todo-check ${t.done ? 'checked' : ''}" onclick="toggleTodo(${t.id})"></div>
+      <div class="todo-text ${t.done ? 'done' : ''}">${esc(t.text)}</div>
+      <span class="priority-badge p-${t.priority}">${labels[t.priority]}</span>
+      <button class="edit-btn" onclick="editTodo(${t.id})" title="編集">✏</button>
+      <button class="delete-btn" onclick="deleteTodo(${t.id})">×</button>
+    </div>
+  `).join('');
+}
+
+/* ===========================
+   MEMO
+=========================== */
+const MEMO_DEFAULTS = [
+  { id: 1, title: 'Dockerコンテナ一覧', category: 'command', body: 'docker ps -a\ndocker ps --filter "status=running"' },
+  { id: 2, title: 'Gitブランチ操作', category: 'command', body: 'git checkout -b feature/xxx\ngit branch -d feature/xxx\ngit push origin --delete feature/xxx' },
+  { id: 3, title: 'MySQLダンプ', category: 'script', body: 'mysqldump -u root -p dbname > dump.sql\nmysql -u root -p dbname < dump.sql' },
+  { id: 4, title: 'コードレビュー依頼プロンプト', category: 'prompt', body: '以下のコードをレビューしてください。\n問題点とその改善案を教えてください。\n\n```\n[コードをここに貼る]\n```' },
+];
+let memos = loadMemos() || MEMO_DEFAULTS;
+let memoNextId = memos.reduce((max, m) => Math.max(max, m.id), 0) + 1;
+let memoFilter = 'all';
+const catLabels = { command: 'コマンド', script: 'スクリプト', prompt: 'プロンプト', other: 'その他' };
+
+function openMemoModal()  { document.getElementById('modal-overlay').classList.add('open'); }
+function closeMemoModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+  document.getElementById('m-title').value = '';
+  document.getElementById('m-body').value  = '';
+}
+function closeModalOutside(e) { if (e.target === document.getElementById('modal-overlay')) closeMemoModal(); }
+
+function saveMemo() {
+  const title = document.getElementById('m-title').value.trim();
+  const body  = document.getElementById('m-body').value.trim();
+  if (!title || !body) return;
+  memos.unshift({ id: memoNextId++, title, category: document.getElementById('m-cat').value, body });
+  closeMemoModal();
+  saveMemos();
+  renderMemo();
+}
+function deleteMemo(id) {
+  memos = memos.filter(m => m.id !== id);
+  saveMemos();
+  renderMemo();
+}
+
+function copyMemo(id, btn) {
+  const m = memos.find(m => m.id === id);
+  if (!m) return;
+  navigator.clipboard.writeText(m.body).then(() => {
+    btn.textContent = '✓ コピー済み'; btn.classList.add('copy-ok');
+    setTimeout(() => { btn.textContent = 'コピー'; btn.classList.remove('copy-ok'); }, 1500);
+  });
+}
+
+function setMemoFilter(f, btn) {
+  memoFilter = f;
+  document.querySelectorAll('#page-memo .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderMemo();
+}
+
+function renderMemo() {
+  const grid = document.getElementById('memo-grid');
+  const filtered = memoFilter === 'all' ? memos : memos.filter(m => m.category === memoFilter);
+  if (!filtered.length) { grid.innerHTML = '<div class="empty-msg">メモがありません</div>'; return; }
+  grid.innerHTML = filtered.map(m => `
+    <div class="memo-card">
+      <div class="memo-card-header">
+        <div class="memo-card-title">${esc(m.title)}</div>
+        <span class="cat-badge cat-${m.category}">${catLabels[m.category]}</span>
+      </div>
+      <div class="memo-card-body">${esc(m.body)}</div>
+      <div class="memo-card-footer">
+        <button class="icon-btn" onclick="copyMemo(${m.id}, this)">コピー</button>
+        <button class="icon-btn" onclick="deleteMemo(${m.id})">削除</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ===========================
+   NOTEPAD
+=========================== */
+const NOTEPAD_KEY = 'mytools_notepad';
+const editor = document.getElementById('editor');
+const charCount = document.getElementById('char-count');
+const saveIndicator = document.getElementById('save-indicator');
+let saveTimer;
+
+/* 起動時に復元 */
+const savedText = localStorage.getItem(NOTEPAD_KEY);
+if (savedText) {
+  editor.value = savedText;
+  charCount.textContent = savedText.length.toLocaleString() + ' 文字';
+  saveIndicator.textContent = '保存済み';
+  saveIndicator.classList.add('saved');
+}
+
+editor.addEventListener('input', () => {
+  charCount.textContent = editor.value.length.toLocaleString() + ' 文字';
+  saveIndicator.textContent = '編集中...';
+  saveIndicator.classList.remove('saved');
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    localStorage.setItem(NOTEPAD_KEY, editor.value);
+    saveIndicator.textContent = '保存済み';
+    saveIndicator.classList.add('saved');
+  }, 1000);
+});
+
+function setEditorFont(type) {
+  if (type === 'mono') {
+    editor.classList.add('mono');
+    document.getElementById('font-mono').classList.add('active');
+    document.getElementById('font-sans').classList.remove('active');
+  } else {
+    editor.classList.remove('mono');
+    document.getElementById('font-sans').classList.add('active');
+    document.getElementById('font-mono').classList.remove('active');
+  }
+}
+
+function copyAll() {
+  if (!editor.value) return;
+  navigator.clipboard.writeText(editor.value).then(() => {
+    const btn = document.getElementById('copy-btn');
+    btn.textContent = '✓ コピー済み';
+    setTimeout(() => { btn.textContent = 'コピー'; }, 1500);
+  });
+}
+
+function downloadTxt() {
+  if (!editor.value) return;
+  const now = new Date();
+  const ts = now.getFullYear() + ('0'+(now.getMonth()+1)).slice(-2) + ('0'+now.getDate()).slice(-2)
+           + '_' + ('0'+now.getHours()).slice(-2) + ('0'+now.getMinutes()).slice(-2);
+  const blob = new Blob([editor.value], { type: 'text/plain;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'memo_' + ts + '.txt';
+  a.click();
+}
+
+function clearAll() {
+  if (!editor.value) return;
+  if (confirm('入力内容を全て削除しますか？')) {
+    editor.value = '';
+    charCount.textContent = '0 文字';
+    saveIndicator.textContent = '未入力';
+    saveIndicator.classList.remove('saved');
+    localStorage.removeItem(NOTEPAD_KEY);
+  }
+}
+
+editor.addEventListener('keydown', e => {
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    const s = editor.selectionStart, end = editor.selectionEnd;
+    editor.value = editor.value.slice(0, s) + '    ' + editor.value.slice(end);
+    editor.selectionStart = editor.selectionEnd = s + 4;
+  }
+});
+
+/* ===== Util ===== */
+function esc(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* Init */
+renderTodo();
+renderMemo();
+</script>
+</body>
+</html>

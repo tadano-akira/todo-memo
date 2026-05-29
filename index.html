@@ -147,6 +147,8 @@ function showPage(id, btn) {
 =========================== */
 const TODO_KEY = 'mytools_todos';
 const MEMO_KEY = 'mytools_memos';
+const TODO_FILTER_KEY = 'mytools_todo_filter';
+const MEMO_FILTER_KEY = 'mytools_memo_filter';
 
 function loadTodos() {
   try { return JSON.parse(localStorage.getItem(TODO_KEY)) || null; } catch { return null; }
@@ -172,7 +174,7 @@ const TODO_DEFAULTS = [
 ];
 let todos = loadTodos() || TODO_DEFAULTS;
 let todoNextId = todos.reduce((max, t) => Math.max(max, t.id), 0) + 1;
-let todoFilter = 'all';
+let todoFilter = localStorage.getItem(TODO_FILTER_KEY) || 'all';
 
 function addTodo() {
   const input = document.getElementById('new-todo');
@@ -232,6 +234,7 @@ function saveEditTodo(id, input) {
 
 function setTodoFilter(f, btn) {
   todoFilter = f;
+  localStorage.setItem(TODO_FILTER_KEY, f);
   document.querySelectorAll('#page-todo .filter-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   renderTodo();
@@ -270,7 +273,7 @@ const MEMO_DEFAULTS = [
 ];
 let memos = loadMemos() || MEMO_DEFAULTS;
 let memoNextId = memos.reduce((max, m) => Math.max(max, m.id), 0) + 1;
-let memoFilter = 'all';
+let memoFilter = localStorage.getItem(MEMO_FILTER_KEY) || 'all';
 const catLabels = { command: 'コマンド', script: 'スクリプト', prompt: 'プロンプト', other: 'その他' };
 
 function openMemoModal()  { document.getElementById('modal-overlay').classList.add('open'); }
@@ -307,6 +310,7 @@ function copyMemo(id, btn) {
 
 function setMemoFilter(f, btn) {
   memoFilter = f;
+  localStorage.setItem(MEMO_FILTER_KEY, f);
   document.querySelectorAll('#page-memo .filter-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   renderMemo();
@@ -508,6 +512,17 @@ function showImportSuccess() {
 }
 
 /* Init */
+// 保存済みフィルターをボタンに反映
+(function() {
+  const savedTodoFilter = localStorage.getItem(TODO_FILTER_KEY) || 'all';
+  document.querySelectorAll('#page-todo .filter-btn').forEach(b => {
+    b.classList.toggle('active', b.getAttribute('onclick').includes("'" + savedTodoFilter + "'"));
+  });
+  const savedMemoFilter = localStorage.getItem(MEMO_FILTER_KEY) || 'all';
+  document.querySelectorAll('#page-memo .filter-btn').forEach(b => {
+    b.classList.toggle('active', b.getAttribute('onclick').includes("'" + savedMemoFilter + "'"));
+  });
+})();
 renderTodo();
 renderMemo();
 </script>
